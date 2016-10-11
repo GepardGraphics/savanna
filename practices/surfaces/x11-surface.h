@@ -41,8 +41,37 @@ namespace practices {
 
 class X11Surface {
 public:
-    X11Surface(const uint32_t width = 640, const uint32_t height = 480, const std::string windowTitle = "X to Savanna");
-    ~X11Surface();
+    X11Surface(const uint32_t width = 640, const uint32_t height = 480, const std::string windowTitle = "X to Savanna")
+        : _width(width)
+        , _height(height)
+    {
+        _display = XOpenDisplay(NULL);
+
+        if (_display) {
+            XSetWindowAttributes windowAttributes;
+            XWMHints hints;
+            Window root = 0;
+
+            root = XDefaultRootWindow(_display);
+            windowAttributes.event_mask = ExposureMask | PointerMotionMask | KeyPressMask;
+            _window = XCreateWindow ( // create a window with the provided parameters
+                _display, root, 0, 0, width, height, 0,
+                CopyFromParent, InputOutput, CopyFromParent, CWEventMask, &windowAttributes);
+            hints.input = True;
+            hints.flags = InputHint;
+            XSetWMHints(_display, _window, &hints);
+
+            XMapWindow(_display, _window); // make the window visible on the screen
+            XStoreName(_display, _window, windowTitle.c_str());
+        }
+    }
+    ~X11Surface()
+    {
+        if (_display) {
+            XDestroyWindow(_display, _window);
+            XCloseDisplay(_display);
+        }
+    }
 
     const uint32_t width() const { return _width; }
     const uint32_t height() const { return _height; }
@@ -55,41 +84,6 @@ private:
     Display* _display;
     Window _window;
 };
-
-// X11Surface declaration.
-
-X11Surface::X11Surface(const uint32_t width, const uint32_t height, const std::string windowTitle)
-    : _width(width)
-    , _height(height)
-{
-    _display = XOpenDisplay(NULL);
-
-    if (_display) {
-        XSetWindowAttributes windowAttributes;
-        XWMHints hints;
-        Window root = 0;
-
-        root = XDefaultRootWindow(_display);
-        windowAttributes.event_mask = ExposureMask | PointerMotionMask | KeyPressMask;
-        _window = XCreateWindow ( // create a window with the provided parameters
-            _display, root, 0, 0, width, height, 0,
-            CopyFromParent, InputOutput, CopyFromParent, CWEventMask, &windowAttributes);
-        hints.input = True;
-        hints.flags = InputHint;
-        XSetWMHints(_display, _window, &hints);
-
-        XMapWindow(_display, _window); // make the window visible on the screen
-        XStoreName(_display, _window, windowTitle.c_str());
-    }
-}
-
-X11Surface::~X11Surface()
-{
-    if (_display) {
-        XDestroyWindow(_display, _window);
-        XCloseDisplay(_display);
-    }
-}
 
 } // namespace practices
 

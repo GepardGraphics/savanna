@@ -1,5 +1,4 @@
 SOURCES=	fill-rect-01-simple.cpp \
-			fill-rect-02-simple.cpp \
 
 EXECUTABLES=$(SOURCES:.cpp=)
 

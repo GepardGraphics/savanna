@@ -351,4 +351,4 @@ int main()
     return 0;
 }
 
-#endif SAVANNA_BENCHMARK_ON
+#endif // SAVANNA_BENCHMARK_ON
