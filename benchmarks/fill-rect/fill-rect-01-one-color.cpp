@@ -24,26 +24,23 @@
  */
 
 #include "./../../src/context.h"
-#include <thread>
-#include <chrono>
+#include <stdlib.h>
 
 int main()
 {
-    savanna::Canvas canvas(640, 480);
+    const uint32_t width = 640u;
+    const uint32_t height = 480u;
+    const uint32_t numberOfRects = 100;
+
+    std::srand(1985);
+
+    savanna::Canvas canvas(width, height);
     savanna::Context& ctx = canvas.getContext();
 
     ctx.setFillColor(0.0f, 1.0f, 0.0f, 1.0f);
-    ctx.fillRect(70, 40, 500, 400);
 
-    XEvent event;
-    do {
-        std::this_thread::sleep_for(std::chrono::nanoseconds(1));   // Only for CPU sparing.
-        if (XCheckWindowEvent(canvas.getCanvas().display(), canvas.getCanvas().window(), KeyPress | ClientMessage, &event)) {
-            if (event.type == KeyPress && XLookupKeysym(&event.xkey, 0) == XK_Escape) {
-                break;
-            }
-        }
-    } while (true);
+    for (uint32_t i = 0; i < numberOfRects; ++i)
+        ctx.fillRect(std::rand() % width, std::rand() % height, std::rand() % width, std::rand() % height);
 
     return 0;
 }

@@ -36,14 +36,8 @@ typedef CANVAS_API BaseCanvas;
 
 class Context : BaseContext {
 public:
-    Context(BaseCanvas& canvas) : BaseContext(canvas)
-    {
-        std::cerr << "Construct." << std::endl;
-    }
-    ~Context()
-    {
-       std::cerr << "Destruct." << std::endl;
-    }
+    Context(BaseCanvas& canvas);
+    ~Context();
 
     void setFillColor(const float red, const float green, const float blue, const float alpha = 1.0f);
     void fillRect(const float x, const float y, const float width, const float height);

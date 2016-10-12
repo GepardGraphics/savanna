@@ -23,27 +23,24 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "context.h"
+#include "./../../src/context.h"
+#include <stdlib.h>
 
-namespace savanna {
-
-Context::Context(BaseCanvas& canvas)
-    : BaseContext(canvas)
+int main()
 {
-}
+    const uint32_t width = 640u;
+    const uint32_t height = 480u;
+    const uint32_t numberOfRects = 100;
 
-Context::~Context()
-{
-}
+    std::srand(1985);
 
-void Context::setFillColor(const float red, const float green, const float blue, const float alpha)
-{
-    BaseContext::setFillColor(red, green, blue, alpha);
-}
+    savanna::Canvas canvas(width, height);
+    savanna::Context& ctx = canvas.getContext();
 
-void Context::fillRect(const float x, const float y, const float width, const float height)
-{
-    BaseContext::fillRect(x, y, width, height);
-}
+    for (uint32_t i = 0; i < numberOfRects; ++i) {
+        ctx.setFillColor(float(std::rand() % 255) / 255.0f, float(std::rand() % 255) / 255.0f, float(std::rand() % 255) / 255.0f, float(std::rand() % 255) / 255.0f);
+        ctx.fillRect(std::rand() % width, std::rand() % height, std::rand() % width, std::rand() % height);
+    }
 
-} // namespace savanna
+    return 0;
+}
