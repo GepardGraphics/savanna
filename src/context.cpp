@@ -29,6 +29,7 @@ namespace savanna {
 
 Context::Context(BaseCanvas& canvas)
     : BaseContext(canvas)
+    , _canvas(canvas)
 {
 }
 
@@ -43,7 +44,16 @@ void Context::setFillColor(const float red, const float green, const float blue,
 
 void Context::fillRect(const float x, const float y, const float width, const float height)
 {
+    auto begin = std::chrono::high_resolution_clock::now();
+
     BaseContext::fillRect(x, y, width, height);
+
+    if (measures.fillRect.on) {
+        auto end = std::chrono::high_resolution_clock::now();
+
+        measures.fillRect.calls++;
+        measures.fillRect.sumElapsedMiliSec += std::chrono::duration_cast<std::chrono::milliseconds>(end-begin).count();
+    }
 }
 
 } // namespace savanna

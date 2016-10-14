@@ -29,17 +29,25 @@
 import subprocess
 
 def build():
-    subprocess.call("make")
+    return subprocess.call("make")
 
 
 def run():
-    subprocess.call("./build/bin/fill-rect-01-one-color")
-    subprocess.call("./build/bin/fill-rect-02-more-color")
+    ret = 0
+    if ret != -1:
+        ret = subprocess.call("./build/bin/fill-rect-01-one-color")
+    if ret != -1:
+        ret = subprocess.call("./build/bin/fill-rect-02-more-color")
 
 
 def main():
-    build()
-    run()
+    ret = build()
+    if not ret:
+        print ("Built ready")
+        print ("")
+        run()
+    else:
+        print("Build failed")
 
 
 if __name__ == "__main__":

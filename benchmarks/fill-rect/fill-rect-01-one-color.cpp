@@ -25,22 +25,44 @@
 
 #include "./../../src/context.h"
 #include <stdlib.h>
+#include <limits>
 
 int main()
 {
     const uint32_t width = 640u;
     const uint32_t height = 480u;
-    const uint32_t numberOfRects = 100;
+    const uint32_t numberOfRects = std::numeric_limits<uint32_t>::max();
+    const int64_t fiveSecInMiliSec = 5000;
+    int ret = 0;
 
     std::srand(1985);
 
     savanna::Canvas canvas(width, height);
     savanna::Context& ctx = canvas.getContext();
+    ctx.measures.fillRect.benchmarkName = __FILE__;
+    ctx.measures.fillRect.on = true;
 
     ctx.setFillColor(0.0f, 1.0f, 0.0f, 1.0f);
-
-    for (uint32_t i = 0; i < numberOfRects; ++i)
+    auto begin = std::chrono::high_resolution_clock::now();
+    for (uint32_t i = 0; i < numberOfRects; ++i) {
         ctx.fillRect(std::rand() % width, std::rand() % height, std::rand() % width, std::rand() % height);
 
-    return 0;
+        XEvent event;
+        if (XCheckWindowEvent(canvas.getCanvas().display(), canvas.getCanvas().window(), KeyPress | ClientMessage, &event)) {
+            if (event.type == KeyPress && XLookupKeysym(&event.xkey, 0) == XK_Escape) {
+                ret = -1;
+                break;
+            }
+        }
+
+        auto end = std::chrono::high_resolution_clock::now();
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(end-begin).count() > fiveSecInMiliSec) {
+            ret = -2;
+            break;
+        }
+    }
+
+    std::clog << ctx.measures.fillRect << ((ret == -2) ? " (exit timeout)" : ((ret == -1) ? " (interrupted)" : " done")) << std::endl;
+
+    return ret;
 }

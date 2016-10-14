@@ -26,6 +26,7 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+#include <chrono>
 #include <iostream>
 #include API_INCLUDE
 
@@ -36,12 +37,37 @@ typedef CANVAS_API BaseCanvas;
 
 class Context : BaseContext {
 public:
+    struct Measure {
+        struct MeasureOfFunction {
+            bool on;
+            uint32_t calls;
+            uint64_t sumElapsedMiliSec;
+            std::string benchmarkName;
+            std::string functionName;
+        }
+        fillRect = { false, 0, 0, "unknow", "fillRect()"};
+
+    } measures;
+
     Context(BaseCanvas& canvas);
     ~Context();
 
     void setFillColor(const float red, const float green, const float blue, const float alpha = 1.0f);
     void fillRect(const float x, const float y, const float width, const float height);
+private:
+    BaseCanvas& _canvas;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Context::Measure::MeasureOfFunction& o)
+{
+    os << "\t" << o.calls << " fc "
+       << "\t" << o.sumElapsedMiliSec << " ms "
+       << "\t" << float(o.sumElapsedMiliSec) / float(o.calls) << " ms/fc "
+       << "\t" << float(o.calls) / float(o.sumElapsedMiliSec) * float(1000.0f) << " fc/s "
+       << "\t: " << o.benchmarkName
+       << "\t" << o.functionName;
+    return os;
+}
 
 class Canvas {
 public:
